@@ -13,6 +13,8 @@ interface DeploymentContext {
   login: string
 }
 
+const isTrue = (value: string): boolean => value === 'true'
+
 const deploymentContext = (): DeploymentContext => {
   const {owner, repo} = context.repo
   if (context.eventName === 'push') {
@@ -46,62 +48,71 @@ const deploymentContext = (): DeploymentContext => {
   }
 }
 
+const createDeploymentPayload = (): Octokit.ReposCreateDeploymentParams => {
+  const {login, owner, ref, repo} = deploymentContext()
+  const requiredContext = core
+    .getInput('requiredContext')
+    .split(',')
+    .filter(x => x !== '')
+  const autoMerge = core.getInput('autoMerge')
+  const transientEnvironment = core.getInput('transientEnvironment')
+  const productionEnvironment = core.getInput('productionEnvironment')
+
+  return {
+    owner,
+    repo,
+    ref,
+    required_contexts: requiredContext,
+    payload: JSON.stringify({
+      user: login,
+      environment: 'qa',
+      description: 'deploying my lovely branch'
+    }),
+    environment: 'qa',
+    transient_environment: isTrue(transientEnvironment),
+    auto_merge: isTrue(autoMerge),
+    production_environment: isTrue(productionEnvironment)
+  }
+}
+
+const createDeploymentStatusPayload = (
+  deploymentId: string
+): Octokit.ReposCreateDeploymentStatusParams => {
+  const {owner, repo} = deploymentContext()
+  const state = core.getInput('state') as DeploymentState
+  const environmentUrl = core.getInput('environmentUrl')
+  const {sha} = context
+  const logUrl = `https://github.com/${owner}/${owner}/commit/${sha}/checks`
+  return {
+    owner,
+    repo,
+    deployment_id: parseInt(deploymentId, 10),
+    state,
+    description: 'this is pr',
+    log_url: logUrl,
+    environment_url: environmentUrl
+  }
+}
 async function run(): Promise<void> {
   try {
     const githubToken = core.getInput('token')
-    const environmentUrl = core.getInput('environmentUrl')
-    const requiredContext = core
-      .getInput('requiredContext')
-      .split(',')
-      .filter(x => x !== '')
     let deploymentId = core.getInput('deploymentId')
-    core.debug(`deployment id: ${deploymentId}`)
 
     const octokit = new GitHub(githubToken, {})
-    const {login, owner, ref, repo} = deploymentContext()
 
     if (deploymentId === '') {
-      const createDeploymentPayload = {
-        owner,
-        repo,
-        ref,
-        required_contexts: requiredContext,
-        payload: JSON.stringify({
-          user: login,
-          environment: 'qa',
-          description: 'deploying my lovely branch'
-        }),
-        environment: 'qa',
-        transient_environment: true,
-        auto_merge: false,
-        production_environment: false
-      }
-      core.info(JSON.stringify(createDeploymentPayload))
       const deploy = await octokit.repos.createDeployment(
-        createDeploymentPayload
+        createDeploymentPayload()
       )
       deploymentId = `${deploy.data.id}`
+      core.info(`Created deployment id: ${deploymentId}`)
     }
 
-    const state = core.getInput('state') as DeploymentState
-
-    const {sha} = context
-    const logUrl = `https://github.com/${owner}/${owner}/commit/${sha}/checks`
-    const createDeploymentStatusPayload = {
-      owner,
-      repo,
-      deployment_id: parseInt(deploymentId, 10),
-      state,
-      description: 'this is pr',
-      log_url: logUrl,
-      environment_url: environmentUrl
-    }
-    core.info(JSON.stringify(createDeploymentStatusPayload))
     const deploymentStatus = await octokit.repos.createDeploymentStatus(
-      createDeploymentStatusPayload
+      createDeploymentStatusPayload(deploymentId)
     )
 
-    core.debug(`Created deployment status: ${deploymentStatus.data.id}`)
+    core.info(`Created deployment status: ${deploymentStatus.data.id}`)
 
     core.setOutput('deploymentId', deploymentId)
   } catch (error) {

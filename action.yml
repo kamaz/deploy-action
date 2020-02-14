@@ -18,9 +18,22 @@ inputs:
     description: Environment url to link to
     required: false
     default: ''
+  autoMerge:
+    description: Auto merge
+    required: false
+    default: 'false'
+  transientEnvironment:
+    description: Transient environment
+    required: false
+    default: 'true'
+  productionEnvironment:
+    description: Production environment
+    required: false
+    default: 'false'
   token:
     description: Github token
     required: true
+
 outputs:
   deploymentId: # id of the output
     description: 'The sum of the inputs'
