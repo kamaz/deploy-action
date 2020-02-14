@@ -2046,8 +2046,12 @@ function run() {
         try {
             const githubToken = core.getInput('token');
             const environmentUrl = core.getInput('environmentUrl');
-            const requiredContext = core.getInput('requiredContext');
+            const requiredContext = core
+                .getInput('requiredContext')
+                .split(',')
+                .filter(x => x !== '');
             let deploymentId = core.getInput('deploymentId');
+            core.debug(`deployment id: ${deploymentId}`);
             const octokit = new github_1.GitHub(githubToken, {});
             const { login, owner, ref, repo } = deploymentContext();
             if (deploymentId === '') {
@@ -2055,7 +2059,7 @@ function run() {
                     owner,
                     repo,
                     ref,
-                    required_contexts: requiredContext.split(',').filter(x => x !== ''),
+                    required_contexts: requiredContext,
                     payload: JSON.stringify({
                         user: login,
                         environment: 'qa',
@@ -2073,7 +2077,7 @@ function run() {
             const state = core.getInput('state');
             const { sha } = github_1.context;
             const logUrl = `https://github.com/${owner}/${owner}/commit/${sha}/checks`;
-            const deploymentStatus = yield octokit.repos.createDeploymentStatus({
+            const createDeploymentStatusPayload = {
                 owner,
                 repo,
                 deployment_id: parseInt(deploymentId, 10),
@@ -2081,7 +2085,9 @@ function run() {
                 description: 'this is pr',
                 log_url: logUrl,
                 environment_url: environmentUrl
-            });
+            };
+            core.info(JSON.stringify(createDeploymentStatusPayload));
+            const deploymentStatus = yield octokit.repos.createDeploymentStatus(createDeploymentStatusPayload);
             core.debug(`Created deployment status: ${deploymentStatus.data.id}`);
             core.setOutput('deploymentId', deploymentId);
         }

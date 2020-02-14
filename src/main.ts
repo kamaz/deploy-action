@@ -50,8 +50,12 @@ async function run(): Promise<void> {
   try {
     const githubToken = core.getInput('token')
     const environmentUrl = core.getInput('environmentUrl')
-    const requiredContext = core.getInput('requiredContext')
+    const requiredContext = core
+      .getInput('requiredContext')
+      .split(',')
+      .filter(x => x !== '')
     let deploymentId = core.getInput('deploymentId')
+    core.debug(`deployment id: ${deploymentId}`)
 
     const octokit = new GitHub(githubToken, {})
     const {login, owner, ref, repo} = deploymentContext()
@@ -61,7 +65,7 @@ async function run(): Promise<void> {
         owner,
         repo,
         ref,
-        required_contexts: requiredContext.split(',').filter(x => x !== ''),
+        required_contexts: requiredContext,
         payload: JSON.stringify({
           user: login,
           environment: 'qa',
@@ -83,7 +87,7 @@ async function run(): Promise<void> {
 
     const {sha} = context
     const logUrl = `https://github.com/${owner}/${owner}/commit/${sha}/checks`
-    const deploymentStatus = await octokit.repos.createDeploymentStatus({
+    const createDeploymentStatusPayload = {
       owner,
       repo,
       deployment_id: parseInt(deploymentId, 10),
@@ -91,7 +95,11 @@ async function run(): Promise<void> {
       description: 'this is pr',
       log_url: logUrl,
       environment_url: environmentUrl
-    })
+    }
+    core.info(JSON.stringify(createDeploymentStatusPayload))
+    const deploymentStatus = await octokit.repos.createDeploymentStatus(
+      createDeploymentStatusPayload
+    )
 
     core.debug(`Created deployment status: ${deploymentStatus.data.id}`)
 
