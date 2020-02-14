@@ -1,10 +1,29 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: Deploy Application Action
+description: Marks application as deployed with specified url
+branding:
+  icon: server
+  color: purple
 inputs:
-  myInput:              # change this
-    description: 'input description here'
-    default: 'default value if applicable'
+  deploymentId:
+    description: Deployment id when setting only status
+    required: false
+  state:
+    description: Status of deployment
+    required: false
+    default: pending
+  environmentUrl:
+    description: Environment url to link to
+    required: false
+  requiredContext:
+    description: Environment url to link to
+    required: false
+    default: ''
+  token:
+    description: Github token
+    required: true
+outputs:
+  deploymentId: # id of the output
+    description: 'The sum of the inputs'
 runs:
   using: 'node12'
   main: 'dist/index.js'

@@ -1,10 +1,11 @@
 {
-  "name": "typescript-action",
-  "version": "0.0.0",
+  "name": "deploy-action",
+  "version": "0.0.1",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "Creates a deployment link to any known url environment",
   "main": "lib/main.js",
   "scripts": {
+    "postinstall": "patch-package",
     "build": "tsc",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
@@ -15,17 +16,23 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/kamaz/deploy-action.git"
   },
   "keywords": [
+    "status",
+    "deploy",
     "actions",
     "node",
     "setup"
   ],
-  "author": "YourNameOrOrganization",
+  "author": "kamaz",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.0"
+    "@actions/core": "^1.2.0",
+    "@actions/github": "^2.1.0",
+    "@octokit/webhooks": "^7.0.0",
+    "patch-package": "^6.2.0",
+    "postinstall-postinstall": "^2.0.0"
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",
