@@ -2083,7 +2083,7 @@ function run() {
                 environment_url: environmentUrl
             });
             core.debug(`Created deployment status: ${deploymentStatus.data.id}`);
-            core.setOutput('deploymentId', new Date().toTimeString());
+            core.setOutput('deploymentId', deploymentId);
         }
         catch (error) {
             core.setFailed(error.message);
