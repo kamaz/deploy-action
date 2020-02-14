@@ -2013,6 +2013,34 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github_1 = __webpack_require__(469);
+const deploymentContext = () => {
+    const { owner, repo } = github_1.context.repo;
+    if (github_1.context.eventName === 'push') {
+        const { ref, pusher: { name } } = github_1.context.payload;
+        return {
+            owner,
+            repo,
+            ref,
+            login: name
+        };
+    }
+    else if (github_1.context.eventName === 'pull_request') {
+        const { pull_request } = github_1.context.payload;
+        const { ref } = pull_request.head;
+        const { user: { login } } = pull_request;
+        return {
+            owner,
+            repo,
+            ref,
+            login
+        };
+    }
+    else {
+        const message = `unsupported event name: ${github_1.context.eventName}`;
+        core.setFailed(message);
+        throw new Error(message);
+    }
+};
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -2021,10 +2049,7 @@ function run() {
             const requiredContext = core.getInput('requiredContext');
             let deploymentId = core.getInput('deploymentId');
             const octokit = new github_1.GitHub(githubToken, {});
-            const { owner, repo } = github_1.context.repo;
-            const { pull_request } = github_1.context.payload;
-            const { ref } = pull_request.head;
-            const { user: { login } } = pull_request;
+            const { login, owner, ref, repo } = deploymentContext();
             if (deploymentId === '') {
                 const deploy = yield octokit.repos.createDeployment({
                     owner,

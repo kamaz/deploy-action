@@ -6,6 +6,46 @@ import * as Webhooks from '@octokit/webhooks'
 
 type DeploymentState = Octokit.ReposCreateDeploymentStatusParams['state']
 
+interface DeploymentContext {
+  owner: string
+  repo: string
+  ref: string
+  login: string
+}
+
+const deploymentContext = (): DeploymentContext => {
+  const {owner, repo} = context.repo
+  if (context.eventName === 'push') {
+    const {
+      ref,
+      pusher: {name}
+    } = context.payload as Webhooks.WebhookPayloadPush
+
+    return {
+      owner,
+      repo,
+      ref,
+      login: name
+    }
+  } else if (context.eventName === 'pull_request') {
+    const {pull_request} = context.payload as Webhooks.WebhookPayloadPullRequest
+    const {ref} = pull_request.head
+    const {
+      user: {login}
+    } = pull_request
+    return {
+      owner,
+      repo,
+      ref,
+      login
+    }
+  } else {
+    const message = `unsupported event name: ${context.eventName}`
+    core.setFailed(message)
+    throw new Error(message)
+  }
+}
+
 async function run(): Promise<void> {
   try {
     const githubToken = core.getInput('token')
@@ -14,13 +54,7 @@ async function run(): Promise<void> {
     let deploymentId = core.getInput('deploymentId')
 
     const octokit = new GitHub(githubToken, {})
-
-    const {owner, repo} = context.repo
-    const {pull_request} = context.payload as Webhooks.WebhookPayloadPullRequest
-    const {ref} = pull_request.head
-    const {
-      user: {login}
-    } = pull_request
+    const {login, owner, ref, repo} = deploymentContext()
 
     if (deploymentId === '') {
       const deploy = await octokit.repos.createDeployment({
