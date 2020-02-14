@@ -2055,7 +2055,7 @@ function run() {
                     owner,
                     repo,
                     ref,
-                    required_contexts: requiredContext.split(',').filter(x => x === ''),
+                    required_contexts: requiredContext.split(',').filter(x => x !== ''),
                     payload: JSON.stringify({
                         user: login,
                         environment: 'qa',
