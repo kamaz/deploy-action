@@ -2051,7 +2051,7 @@ function run() {
             const octokit = new github_1.GitHub(githubToken, {});
             const { login, owner, ref, repo } = deploymentContext();
             if (deploymentId === '') {
-                const deploy = yield octokit.repos.createDeployment({
+                const createDeploymentPayload = {
                     owner,
                     repo,
                     ref,
@@ -2065,7 +2065,9 @@ function run() {
                     transient_environment: true,
                     auto_merge: false,
                     production_environment: false
-                });
+                };
+                core.info(JSON.stringify(createDeploymentPayload));
+                const deploy = yield octokit.repos.createDeployment(createDeploymentPayload);
                 deploymentId = `${deploy.data.id}`;
             }
             const state = core.getInput('state');

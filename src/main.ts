@@ -57,7 +57,7 @@ async function run(): Promise<void> {
     const {login, owner, ref, repo} = deploymentContext()
 
     if (deploymentId === '') {
-      const deploy = await octokit.repos.createDeployment({
+      const createDeploymentPayload = {
         owner,
         repo,
         ref,
@@ -71,7 +71,11 @@ async function run(): Promise<void> {
         transient_environment: true,
         auto_merge: false,
         production_environment: false
-      })
+      }
+      core.info(JSON.stringify(createDeploymentPayload))
+      const deploy = await octokit.repos.createDeployment(
+        createDeploymentPayload
+      )
       deploymentId = `${deploy.data.id}`
     }
 
