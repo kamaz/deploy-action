@@ -2013,6 +2013,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github_1 = __webpack_require__(469);
+const isTrue = (value) => value === 'true';
 const deploymentContext = () => {
     const { owner, repo } = github_1.context.repo;
     if (github_1.context.eventName === 'push') {
@@ -2041,47 +2042,61 @@ const deploymentContext = () => {
         throw new Error(message);
     }
 };
+const createDeploymentPayload = () => {
+    const { login, owner, ref, repo } = deploymentContext();
+    const requiredContext = core
+        .getInput('requiredContext')
+        .split(',')
+        .filter(x => x !== '');
+    const autoMerge = core.getInput('autoMerge');
+    const transientEnvironment = core.getInput('transientEnvironment');
+    const productionEnvironment = core.getInput('productionEnvironment');
+    return {
+        owner,
+        repo,
+        ref,
+        required_contexts: requiredContext,
+        payload: JSON.stringify({
+            user: login,
+            environment: 'qa',
+            description: 'deploying my lovely branch'
+        }),
+        environment: 'qa',
+        transient_environment: isTrue(transientEnvironment),
+        auto_merge: isTrue(autoMerge),
+        production_environment: isTrue(productionEnvironment)
+    };
+};
+const createDeploymentStatusPayload = (deploymentId) => {
+    const { owner, repo } = deploymentContext();
+    const state = core.getInput('state');
+    const environmentUrl = core.getInput('environmentUrl');
+    const { sha } = github_1.context;
+    const logUrl = `https://github.com/${owner}/${owner}/commit/${sha}/checks`;
+    return {
+        owner,
+        repo,
+        deployment_id: parseInt(deploymentId, 10),
+        state,
+        description: 'this is pr',
+        log_url: logUrl,
+        environment_url: environmentUrl
+    };
+};
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const githubToken = core.getInput('token');
-            const environmentUrl = core.getInput('environmentUrl');
-            const requiredContext = core.getInput('requiredContext');
             let deploymentId = core.getInput('deploymentId');
             const octokit = new github_1.GitHub(githubToken, {});
-            const { login, owner, ref, repo } = deploymentContext();
             if (deploymentId === '') {
-                const deploy = yield octokit.repos.createDeployment({
-                    owner,
-                    repo,
-                    ref,
-                    required_contexts: requiredContext.split(','),
-                    payload: JSON.stringify({
-                        user: login,
-                        environment: 'qa',
-                        description: 'deploying my lovely branch'
-                    }),
-                    environment: 'qa',
-                    transient_environment: true,
-                    auto_merge: false,
-                    production_environment: false
-                });
+                const deploy = yield octokit.repos.createDeployment(createDeploymentPayload());
                 deploymentId = `${deploy.data.id}`;
+                core.info(`Created deployment id: ${deploymentId}`);
             }
-            const state = core.getInput('state');
-            const { sha } = github_1.context;
-            const logUrl = `https://github.com/${owner}/${owner}/commit/${sha}/checks`;
-            const deploymentStatus = yield octokit.repos.createDeploymentStatus({
-                owner,
-                repo,
-                deployment_id: parseInt(deploymentId, 10),
-                state,
-                description: 'this is pr',
-                log_url: logUrl,
-                environment_url: environmentUrl
-            });
-            core.debug(`Created deployment status: ${deploymentStatus.data.id}`);
-            core.setOutput('deploymentId', new Date().toTimeString());
+            const deploymentStatus = yield octokit.repos.createDeploymentStatus(createDeploymentStatusPayload(deploymentId));
+            core.info(`Created deployment status: ${deploymentStatus.data.id}`);
+            core.setOutput('deploymentId', deploymentId);
         }
         catch (error) {
             core.setFailed(error.message);

@@ -25,7 +25,7 @@ jobs:
           environmentUrl: https://github.com/features/actions
       - uses: ./
         with:
-          deploymentId: steps.deployment.outputs.deploymentId
+          deploymentId: ${{steps.deployment.outputs.deploymentId}}
           token: ${{secrets.GITHUB_TOKEN}}
           environmentUrl: https://github.com/features/actions
           state: success
