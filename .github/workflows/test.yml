@@ -29,3 +29,15 @@ jobs:
           token: ${{secrets.GITHUB_TOKEN}}
           environmentUrl: https://github.com/features/actions
           state: success
+  incorrect-deployment-id: # make sure the action works on a clean machine without building
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        id: deployment
+        with:
+          deploymentId: invalid.deployment
+          token: ${{secrets.GITHUB_TOKEN}}
+          environmentUrl: https://github.com/features/actions
+          environment: staging
+          state: failure
