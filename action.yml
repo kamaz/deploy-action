@@ -34,6 +34,10 @@ inputs:
     description: Production environment
     required: false
     default: 'false'
+  # onStateFailureStopBuild:
+  #   description: Github token
+  #   required: false
+  #   default: 'true'
   token:
     description: Github token
     required: true

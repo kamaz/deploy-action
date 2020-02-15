@@ -2,22 +2,30 @@
 
 Action is a wrapper around deployment api.
 
-https://developer.github.com/v3/repos/deployments/
+For detail documentation and explanation refer to:
 
-https://developer.github.com/v3/repos/deployments/#create-a-deployment
-
-https://developer.github.com/v3/repos/deployments/#create-a-deployment-status
+- [GitHub Deployments API](https://developer.github.com/v3/repos/deployments/)
+- [GitHub Deployments API Create Deployment Section](https://developer.github.com/v3/repos/deployments/#create-a-deployment)
+- [GitHub Deployments API Create Deployment Status Section](https://developer.github.com/v3/repos/deployments/#create-a-deployment-status)
 
 ## Inputs
 
-| Output | Value |
-|-----|-----|
-| token | github token |
+| Input                 | Optional | Default | Description            |
+| --------------------- | -------- | ------- | ---------------------- |
+| token                 | No       | -       | github token           |
+| deploymentId          | Yes      | Empty   |                        |
+| state                 | Yes      | pending |                        |
+| environmentUrl        | Yes      | -       |                        |
+| requiredContext       | Yes      | Empty   | Format 'value1,value2' |
+| autoMerge             | Yes      | false   |                        |
+| environment           | Yes      | qa      |                        |
+| transientEnvironment  | Yes      | true    |                        |
+| productionEnvironment | Yes      | false   |                        |
 
 ## Outputs
 
-| Output | Value |
-| --- | --- |
+| Output       | Value                                                    |
+| ------------ | -------------------------------------------------------- |
 | deploymentId | a deployment number that can be used to set status later |
 
 ## Example usage
