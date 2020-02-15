@@ -2088,6 +2088,8 @@ function run() {
         try {
             const githubToken = core.getInput('token');
             let deploymentId = core.getInput('deploymentId');
+            core.debug(`Deployment id ${deploymentId}`);
+            core.info(`Deployment id ${deploymentId}`);
             const octokit = new github_1.GitHub(githubToken, {});
             if (deploymentId === '') {
                 const deploy = yield octokit.repos.createDeployment(createDeploymentPayload());

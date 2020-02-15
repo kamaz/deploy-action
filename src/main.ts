@@ -98,6 +98,9 @@ async function run(): Promise<void> {
     const githubToken = core.getInput('token')
     let deploymentId = core.getInput('deploymentId')
 
+    core.debug(`Deployment id ${deploymentId}`)
+    core.info(`Deployment id ${deploymentId}`)
+
     const octokit = new GitHub(githubToken, {})
 
     if (deploymentId === '') {
