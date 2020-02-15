@@ -76,7 +76,7 @@ const createDeploymentPayload = (): Octokit.ReposCreateDeploymentParams => {
 }
 
 const createDeploymentStatusPayload = (
-  deploymentId: string
+  deploymentId: number
 ): Octokit.ReposCreateDeploymentStatusParams => {
   const {owner, repo} = deploymentContext()
   const state = core.getInput('state') as DeploymentState
@@ -86,7 +86,7 @@ const createDeploymentStatusPayload = (
   return {
     owner,
     repo,
-    deployment_id: parseInt(deploymentId, 10),
+    deployment_id: deploymentId,
     state,
     description: 'this is pr',
     log_url: logUrl,
@@ -96,18 +96,18 @@ const createDeploymentStatusPayload = (
 async function run(): Promise<void> {
   try {
     const githubToken = core.getInput('token')
-    let deploymentId = core.getInput('deploymentId')
+    let deploymentId = parseInt(core.getInput('deploymentId'), 10)
 
     core.debug(`Deployment id ${deploymentId}`)
     core.info(`Deployment id ${deploymentId}`)
 
     const octokit = new GitHub(githubToken, {})
 
-    if (deploymentId === '') {
+    if (isNaN(deploymentId)) {
       const deploy = await octokit.repos.createDeployment(
         createDeploymentPayload()
       )
-      deploymentId = `${deploy.data.id}`
+      deploymentId = deploy.data.id
       core.info(`Created deployment id: ${deploymentId}`)
     }
 
@@ -117,7 +117,7 @@ async function run(): Promise<void> {
 
     core.info(`Created deployment status: ${deploymentStatus.data.id}`)
 
-    core.setOutput('deploymentId', deploymentId)
+    core.setOutput('deploymentId', `${deploymentId}`)
   } catch (error) {
     core.setFailed(error.message)
   }
