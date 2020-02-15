@@ -39,3 +39,5 @@ jobs:
           deploymentId: invalid.deployment
           token: ${{secrets.GITHUB_TOKEN}}
           environmentUrl: https://github.com/features/actions
+          environment: staging
+          state: failure

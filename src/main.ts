@@ -49,7 +49,7 @@ const deploymentContext = (): DeploymentContext => {
 }
 
 const createDeploymentPayload = (): Octokit.ReposCreateDeploymentParams => {
-  const {login, owner, ref, repo} = deploymentContext()
+  const {owner, ref, repo} = deploymentContext()
   const requiredContext = core
     .getInput('requiredContext')
     .split(',')
@@ -57,18 +57,14 @@ const createDeploymentPayload = (): Octokit.ReposCreateDeploymentParams => {
   const autoMerge = core.getInput('autoMerge')
   const transientEnvironment = core.getInput('transientEnvironment')
   const productionEnvironment = core.getInput('productionEnvironment')
+  const environment = core.getInput('environment')
 
   return {
     owner,
     repo,
     ref,
     required_contexts: requiredContext,
-    payload: JSON.stringify({
-      user: login,
-      environment: 'qa',
-      description: 'deploying my lovely branch'
-    }),
-    environment: 'qa',
+    environment,
     transient_environment: isTrue(transientEnvironment),
     auto_merge: isTrue(autoMerge),
     production_environment: isTrue(productionEnvironment)

@@ -2,6 +2,12 @@
 
 Action is a wrapper around deployment api.
 
+https://developer.github.com/v3/repos/deployments/
+
+https://developer.github.com/v3/repos/deployments/#create-a-deployment
+
+https://developer.github.com/v3/repos/deployments/#create-a-deployment-status
+
 ## Inputs
 
 | Output | Value |
