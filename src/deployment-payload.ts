@@ -6,7 +6,7 @@ import {AppContext} from './app'
 const envName = (context: AppContext): string => {
   const {type, number} = deploymentContext(context)
 
-  return type === 'push' ? 'qa' : `pr-${number}`
+  return type === 'push' ? 'qa' : `pr${number}`
 }
 
 export const createDeploymentPayload = (

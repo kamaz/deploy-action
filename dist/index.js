@@ -9508,7 +9508,7 @@ const deployment_context_1 = __webpack_require__(157);
 const converter_1 = __webpack_require__(538);
 const envName = (context) => {
     const { type, number } = deployment_context_1.deploymentContext(context);
-    return type === 'push' ? 'qa' : `pr-${number}`;
+    return type === 'push' ? 'qa' : `pr${number}`;
 };
 exports.createDeploymentPayload = (context) => {
     var _a, _b;
