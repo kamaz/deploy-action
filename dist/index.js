@@ -8977,6 +8977,7 @@ exports.createDeploymentStatusPayload = (deploymentId, context) => {
     return {
         owner,
         repo,
+        auto_inactive: true,
         deployment_id: deploymentId,
         state,
         description: 'this is pr',

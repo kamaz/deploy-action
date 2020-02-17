@@ -119,6 +119,7 @@ describe('app', () => {
     expect(mockAppContext.deploymentStatusParams).toEqual({
       deployment_id: 1,
       description: 'this is pr',
+      auto_inactive: true,
       owner: '',
       repo: '',
       log_url: 'https://github.com///commit//checks',

@@ -16,6 +16,7 @@ export const createDeploymentStatusPayload = (
   return {
     owner,
     repo,
+    auto_inactive: true,
     deployment_id: deploymentId,
     state,
     description: 'this is pr',
