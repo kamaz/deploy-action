@@ -4509,11 +4509,13 @@ exports.app = (context) => __awaiter(void 0, void 0, void 0, function* () {
         context.info(`Deployment id ${deploymentId}`);
         if (isNaN(deploymentId)) {
             const deploymentPayload = deployment_payload_1.createDeploymentPayload(context);
+            context.info(`deployment: ${JSON.stringify(deploymentPayload)}`);
             const deployment = yield context.createDeployment(deploymentPayload);
             deploymentId = deployment.data.id;
             context.info(`Created deployment id: ${deploymentId}`);
         }
         const deploymentStatusPayload = deployment_status_payload_1.createDeploymentStatusPayload(deploymentId, context);
+        context.info(`deployment status: ${JSON.stringify(deploymentStatusPayload)}`);
         const deploymentStatus = yield context.createDeploymentStatus(deploymentStatusPayload);
         context.info(`Created deployment status: ${deploymentStatus.data.id}`);
         context.setOutput('deploymentId', `${deploymentId}`);
