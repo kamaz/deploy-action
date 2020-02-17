@@ -25,11 +25,10 @@ inputs:
   environment:
     description: Transient environment
     required: false
-    default: 'qa'
   transientEnvironment:
     description: Transient environment
     required: false
-    default: 'true'
+    default: 'false'
   productionEnvironment:
     description: Production environment
     required: false
