@@ -1857,18 +1857,22 @@ exports.deploymentContext = (context) => {
             owner,
             repo,
             ref,
-            login: name
+            login: name,
+            type: 'push'
         };
     }
     else if (eventName === 'pull_request') {
         const { pull_request } = payload;
         const { ref } = pull_request.head;
         const { user: { login } } = pull_request;
+        const { number } = pull_request;
         return {
             owner,
             repo,
             ref,
-            login
+            login,
+            number,
+            type: 'pull_request'
         };
     }
     else {
@@ -9502,8 +9506,12 @@ function getFirstPage (octokit, link, headers) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const deployment_context_1 = __webpack_require__(157);
 const converter_1 = __webpack_require__(538);
+const envName = (context) => {
+    const { type, number } = deployment_context_1.deploymentContext(context);
+    return type === 'push' ? 'qa' : `pr-${number}`;
+};
 exports.createDeploymentPayload = (context) => {
-    var _a;
+    var _a, _b;
     const { owner, ref, repo } = deployment_context_1.deploymentContext(context);
     const requiredContext = (_a = context.getInput('requiredContext'), (_a !== null && _a !== void 0 ? _a : ''))
         .split(',')
@@ -9511,13 +9519,13 @@ exports.createDeploymentPayload = (context) => {
     const autoMerge = context.getInput('autoMerge');
     const transientEnvironment = context.getInput('transientEnvironment');
     const productionEnvironment = context.getInput('productionEnvironment');
-    // const environment = context.getInput('environment') ?? 'qa'
+    const environment = (_b = context.getInput('environment'), (_b !== null && _b !== void 0 ? _b : envName(context)));
     return {
         owner,
         repo,
         ref,
         required_contexts: requiredContext,
-        environment: 'pr1',
+        environment,
         transient_environment: converter_1.isTrue(transientEnvironment),
         auto_merge: converter_1.isTrue(autoMerge),
         production_environment: converter_1.isTrue(productionEnvironment)
