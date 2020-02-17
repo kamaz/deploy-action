@@ -19,7 +19,7 @@ For detail documentation and explanation refer to:
 | requiredContext       | Yes      | Empty   | Format 'value1,value2' |
 | autoMerge             | Yes      | false   |                        |
 | environment           | Yes      | qa      |                        |
-| transientEnvironment  | Yes      | true    |                        |
+| transientEnvironment  | Yes      | false   |                        |
 | productionEnvironment | Yes      | false   |                        |
 
 ## Outputs

@@ -67,8 +67,11 @@ const createMockAppContext = (): MockAppContext => {
 describe('app', () => {
   it('fails on invalid values', async () => {
     const mockAppContext = createMockAppContext()
+
     await app(mockAppContext)
 
     expect(mockAppContext.setFailedCalled).toBe(true)
   })
+
+  it()
 })
