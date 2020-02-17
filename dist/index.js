@@ -5007,7 +5007,7 @@ const plugin_retry_1 = __webpack_require__(755);
 rest_1.Octokit.plugin([plugin_throttling_1.throttling, plugin_retry_1.retry]);
 exports.createGitHubClient = (context) => {
     const githubToken = context.getInput('token');
-    const octokit = new github_1.GitHub(githubToken);
+    const octokit = new github_1.GitHub(githubToken, { previews: ['flash', 'ant-man'] });
     return {
         createDeployment(deployment) {
             return __awaiter(this, void 0, void 0, function* () {

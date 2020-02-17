@@ -32,7 +32,7 @@ export type GitHubClient = {
 
 export const createGitHubClient = (context: GitHubContext): GitHubClient => {
   const githubToken = context.getInput('token')
-  const octokit = new GitHub(githubToken)
+  const octokit = new GitHub(githubToken, {previews: ['flash', 'ant-man']})
   return {
     async createDeployment(deployment) {
       return octokit.repos.createDeployment(deployment)
