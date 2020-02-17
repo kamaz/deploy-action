@@ -5,8 +5,13 @@ import {AppContext} from './app'
 
 const envName = (context: AppContext): string => {
   const {type, number} = deploymentContext(context)
+  const environment = context.getInput('environment')
+  context.info(`env name is: ${environment}`)
+  if (environment && environment !== '') {
+    return environment
+  }
 
-  return type === 'push' ? 'qa' : `pr${number}`
+  return type === 'push' ? 'qa' : `pr-${number}`
 }
 
 export const createDeploymentPayload = (
@@ -19,7 +24,7 @@ export const createDeploymentPayload = (
   const autoMerge = context.getInput('autoMerge')
   const transientEnvironment = context.getInput('transientEnvironment')
   const productionEnvironment = context.getInput('productionEnvironment')
-  const environment = context.getInput('environment') ?? envName(context)
+  const environment = context.getInput('') ?? envName(context)
 
   return {
     owner,

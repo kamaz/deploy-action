@@ -9508,7 +9508,12 @@ const deployment_context_1 = __webpack_require__(157);
 const converter_1 = __webpack_require__(538);
 const envName = (context) => {
     const { type, number } = deployment_context_1.deploymentContext(context);
-    return type === 'push' ? 'qa' : `pr${number}`;
+    const environment = context.getInput('environment');
+    context.info(`env name is: ${environment}`);
+    if (environment && environment !== '') {
+        return environment;
+    }
+    return type === 'push' ? 'qa' : `pr-${number}`;
 };
 exports.createDeploymentPayload = (context) => {
     var _a, _b;
@@ -9519,7 +9524,7 @@ exports.createDeploymentPayload = (context) => {
     const autoMerge = context.getInput('autoMerge');
     const transientEnvironment = context.getInput('transientEnvironment');
     const productionEnvironment = context.getInput('productionEnvironment');
-    const environment = (_b = context.getInput('environment'), (_b !== null && _b !== void 0 ? _b : envName(context)));
+    const environment = (_b = context.getInput(''), (_b !== null && _b !== void 0 ? _b : envName(context)));
     return {
         owner,
         repo,

@@ -140,7 +140,7 @@ describe('app', () => {
     expect(mockAppContext.hasFailed).toBe(false)
     expect(mockAppContext.deploymentParams).toEqual({
       auto_merge: false,
-      environment: 'pr1',
+      environment: 'pr-1',
       owner: '',
       production_environment: false,
       ref: '',
@@ -160,6 +160,39 @@ describe('app', () => {
     })
   })
 
+  it('creates deployment for pull request when env is ""', async () => {
+    const mockAppContext = createMockAppContext(
+      {
+        environmentUrl: 'https://www.example.com',
+        environment: ''
+      },
+      pullRequestGitHubContext
+    )
+
+    await app(mockAppContext)
+
+    expect(mockAppContext.hasFailed).toBe(false)
+    expect(mockAppContext.deploymentParams).toEqual({
+      auto_merge: false,
+      environment: 'pr-1',
+      owner: '',
+      production_environment: false,
+      ref: '',
+      repo: '',
+      required_contexts: [],
+      transient_environment: false
+    })
+    expect(mockAppContext.deploymentStatusParams).toEqual({
+      deployment_id: 1,
+      description: 'this is pr',
+      auto_inactive: true,
+      owner: '',
+      repo: '',
+      log_url: 'https://github.com///commit//checks',
+      environment_url: 'https://www.example.com',
+      state: undefined
+    })
+  })
   it('creates deployment for push to master', async () => {
     const mockAppContext = createMockAppContext(
       {
