@@ -13,14 +13,14 @@ export const createDeploymentPayload = (
   const autoMerge = context.getInput('autoMerge')
   const transientEnvironment = context.getInput('transientEnvironment')
   const productionEnvironment = context.getInput('productionEnvironment')
-  const environment = context.getInput('environment') ?? 'qa'
+  // const environment = context.getInput('environment') ?? 'qa'
 
   return {
     owner,
     repo,
     ref,
     required_contexts: requiredContext,
-    environment,
+    environment: 'pr1',
     transient_environment: isTrue(transientEnvironment),
     auto_merge: isTrue(autoMerge),
     production_environment: isTrue(productionEnvironment)

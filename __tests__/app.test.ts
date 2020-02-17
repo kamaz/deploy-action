@@ -108,7 +108,7 @@ describe('app', () => {
     expect(mockAppContext.hasFailed).toBe(false)
     expect(mockAppContext.deploymentParams).toEqual({
       auto_merge: false,
-      environment: 'qa',
+      environment: 'pr1',
       owner: '',
       production_environment: false,
       ref: '',

@@ -16,7 +16,6 @@ export const app = async (context: AppContext): Promise<void> => {
 
     if (isNaN(deploymentId)) {
       const deploymentPayload = createDeploymentPayload(context)
-      context.info(`deployment: ${JSON.stringify(deploymentPayload)}`)
       const deployment = await context.createDeployment(deploymentPayload)
       deploymentId = deployment.data.id
       context.info(`Created deployment id: ${deploymentId}`)
@@ -25,9 +24,6 @@ export const app = async (context: AppContext): Promise<void> => {
     const deploymentStatusPayload = createDeploymentStatusPayload(
       deploymentId,
       context
-    )
-    context.info(
-      `deployment status: ${JSON.stringify(deploymentStatusPayload)}`
     )
 
     const deploymentStatus = await context.createDeploymentStatus(

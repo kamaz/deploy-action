@@ -4509,13 +4509,11 @@ exports.app = (context) => __awaiter(void 0, void 0, void 0, function* () {
         context.info(`Deployment id ${deploymentId}`);
         if (isNaN(deploymentId)) {
             const deploymentPayload = deployment_payload_1.createDeploymentPayload(context);
-            context.info(`deployment: ${JSON.stringify(deploymentPayload)}`);
             const deployment = yield context.createDeployment(deploymentPayload);
             deploymentId = deployment.data.id;
             context.info(`Created deployment id: ${deploymentId}`);
         }
         const deploymentStatusPayload = deployment_status_payload_1.createDeploymentStatusPayload(deploymentId, context);
-        context.info(`deployment status: ${JSON.stringify(deploymentStatusPayload)}`);
         const deploymentStatus = yield context.createDeploymentStatus(deploymentStatusPayload);
         context.info(`Created deployment status: ${deploymentStatus.data.id}`);
         context.setOutput('deploymentId', `${deploymentId}`);
@@ -9505,7 +9503,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const deployment_context_1 = __webpack_require__(157);
 const converter_1 = __webpack_require__(538);
 exports.createDeploymentPayload = (context) => {
-    var _a, _b;
+    var _a;
     const { owner, ref, repo } = deployment_context_1.deploymentContext(context);
     const requiredContext = (_a = context.getInput('requiredContext'), (_a !== null && _a !== void 0 ? _a : ''))
         .split(',')
@@ -9513,13 +9511,13 @@ exports.createDeploymentPayload = (context) => {
     const autoMerge = context.getInput('autoMerge');
     const transientEnvironment = context.getInput('transientEnvironment');
     const productionEnvironment = context.getInput('productionEnvironment');
-    const environment = (_b = context.getInput('environment'), (_b !== null && _b !== void 0 ? _b : 'qa'));
+    // const environment = context.getInput('environment') ?? 'qa'
     return {
         owner,
         repo,
         ref,
         required_contexts: requiredContext,
-        environment,
+        environment: 'pr1',
         transient_environment: converter_1.isTrue(transientEnvironment),
         auto_merge: converter_1.isTrue(autoMerge),
         production_environment: converter_1.isTrue(productionEnvironment)
