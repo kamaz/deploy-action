@@ -14,7 +14,7 @@ jobs:
       - run: |
           yarn
           yarn all
-  test: # make sure the action works on a clean machine without building
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -29,7 +29,7 @@ jobs:
           token: ${{secrets.GITHUB_TOKEN}}
           environmentUrl: https://github.com/features/actions
           state: success
-  incorrect-deployment-id: # make sure the action works on a clean machine without building
+  incorrect-deployment-id:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
