@@ -20,7 +20,7 @@ const pullRequestGitHubContext: Context = {
     pull_request: {
       number: 1,
       head: {
-        ref: ''
+        ref: 'pull_ref'
       },
       user: ''
     }
@@ -28,10 +28,10 @@ const pullRequestGitHubContext: Context = {
   eventName: 'pull_request',
   ref: '',
   repo: {
-    owner: '',
-    repo: ''
+    owner: 'kamaz',
+    repo: 'actions'
   },
-  sha: '',
+  sha: 'pull_sha',
   workflow: '',
   action: '',
   actor: '',
@@ -49,12 +49,12 @@ const pushGitHubContext: Context = {
     }
   },
   eventName: 'push',
-  ref: '',
+  ref: 'push_ref',
   repo: {
-    owner: '',
-    repo: ''
+    owner: 'test-owner',
+    repo: 'my-repo'
   },
-  sha: '',
+  sha: 'push_sha',
   workflow: '',
   action: '',
   actor: '',
@@ -127,6 +127,8 @@ const createMockAppContext = (
 }
 
 describe('app', () => {
+  // owner and repo does not work
+  // https://github.com/cabiri-io/cabiri-io/commit/0acdd35f7db68e2398e6c2256c1f5e8924e9986c/checks
   it('creates deployment for pull request', async () => {
     const mockAppContext = createMockAppContext(
       {
@@ -141,10 +143,10 @@ describe('app', () => {
     expect(mockAppContext.deploymentParams).toEqual({
       auto_merge: false,
       environment: 'pr-1',
-      owner: '',
+      owner: 'kamaz',
       production_environment: false,
-      ref: '',
-      repo: '',
+      ref: 'pull_ref',
+      repo: 'actions',
       required_contexts: [],
       transient_environment: false
     })
@@ -152,9 +154,9 @@ describe('app', () => {
       deployment_id: 1,
       description: 'this is pr',
       auto_inactive: true,
-      owner: '',
-      repo: '',
-      log_url: 'https://github.com///commit//checks',
+      owner: 'kamaz',
+      repo: 'actions',
+      log_url: 'https://github.com/kamaz/actions/commit/pull_sha/checks',
       environment_url: 'https://www.example.com',
       state: undefined
     })
@@ -175,24 +177,15 @@ describe('app', () => {
     expect(mockAppContext.deploymentParams).toEqual({
       auto_merge: false,
       environment: 'pr-1',
-      owner: '',
+      owner: 'kamaz',
       production_environment: false,
-      ref: '',
-      repo: '',
+      ref: 'pull_ref',
+      repo: 'actions',
       required_contexts: [],
       transient_environment: false
     })
-    expect(mockAppContext.deploymentStatusParams).toEqual({
-      deployment_id: 1,
-      description: 'this is pr',
-      auto_inactive: true,
-      owner: '',
-      repo: '',
-      log_url: 'https://github.com///commit//checks',
-      environment_url: 'https://www.example.com',
-      state: undefined
-    })
   })
+
   it('creates deployment for push to master', async () => {
     const mockAppContext = createMockAppContext(
       {
@@ -207,10 +200,10 @@ describe('app', () => {
     expect(mockAppContext.deploymentParams).toEqual({
       auto_merge: false,
       environment: 'qa',
-      owner: '',
+      owner: 'test-owner',
       production_environment: false,
       ref: 'push_ref',
-      repo: '',
+      repo: 'my-repo',
       required_contexts: [],
       transient_environment: false
     })
@@ -218,9 +211,9 @@ describe('app', () => {
       deployment_id: 1,
       description: 'this is pr',
       auto_inactive: true,
-      owner: '',
-      repo: '',
-      log_url: 'https://github.com///commit//checks',
+      owner: 'test-owner',
+      repo: 'my-repo',
+      log_url: 'https://github.com/test-owner/my-repo/commit/push_sha/checks',
       environment_url: 'https://www.example.com',
       state: undefined
     })
@@ -241,10 +234,10 @@ describe('app', () => {
     expect(mockAppContext.deploymentParams).toEqual({
       auto_merge: false,
       environment: 'staging',
-      owner: '',
+      owner: 'test-owner',
       production_environment: false,
       ref: 'push_ref',
-      repo: '',
+      repo: 'my-repo',
       required_contexts: [],
       transient_environment: false
     })

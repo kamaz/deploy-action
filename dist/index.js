@@ -8977,7 +8977,7 @@ exports.createDeploymentStatusPayload = (deploymentId, context) => {
     const state = context.getInput('state');
     const environmentUrl = context.getInput('environmentUrl');
     const { sha } = context.gitHubContext;
-    const logUrl = `https://github.com/${owner}/${owner}/commit/${sha}/checks`;
+    const logUrl = `https://github.com/${owner}/${repo}/commit/${sha}/checks`;
     return {
         owner,
         repo,
@@ -9509,7 +9509,6 @@ const converter_1 = __webpack_require__(538);
 const envName = (context) => {
     const { type, number } = deployment_context_1.deploymentContext(context);
     const environment = context.getInput('environment');
-    context.info(`env name is: ${environment}`);
     if (environment && environment !== '') {
         return environment;
     }

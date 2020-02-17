@@ -12,7 +12,7 @@ export const createDeploymentStatusPayload = (
   const state = context.getInput('state') as DeploymentState
   const environmentUrl = context.getInput('environmentUrl')
   const {sha} = context.gitHubContext
-  const logUrl = `https://github.com/${owner}/${owner}/commit/${sha}/checks`
+  const logUrl = `https://github.com/${owner}/${repo}/commit/${sha}/checks`
   return {
     owner,
     repo,
