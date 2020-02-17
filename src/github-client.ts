@@ -1,9 +1,13 @@
 import {GitHub} from '@actions/github'
 import {Octokit} from '@octokit/rest'
 import {GitHubContext} from './github-context'
+import {throttling} from '@octokit/plugin-throttling'
+import {retry} from '@octokit/plugin-retry'
 
-type CreateDeploymentParams = Octokit.ReposCreateDeploymentParams
-type CreateDeploymentStatusParams = Octokit.ReposCreateDeploymentStatusParams
+Octokit.plugin([throttling, retry])
+
+export type CreateDeploymentParams = Octokit.ReposCreateDeploymentParams
+export type CreateDeploymentStatusParams = Octokit.ReposCreateDeploymentStatusParams
 
 export type CreateDeploymentResponse = Octokit.Response<
   Octokit.ReposCreateDeploymentResponse

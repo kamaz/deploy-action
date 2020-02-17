@@ -7,14 +7,13 @@ export const createDeploymentPayload = (
   context: AppContext
 ): Octokit.ReposCreateDeploymentParams => {
   const {owner, ref, repo} = deploymentContext(context)
-  const requiredContext = context
-    .getInput('requiredContext')
+  const requiredContext = (context.getInput('requiredContext') ?? '')
     .split(',')
     .filter(x => x !== '')
   const autoMerge = context.getInput('autoMerge')
   const transientEnvironment = context.getInput('transientEnvironment')
   const productionEnvironment = context.getInput('productionEnvironment')
-  const environment = context.getInput('environment')
+  const environment = context.getInput('environment') ?? 'qa'
 
   return {
     owner,

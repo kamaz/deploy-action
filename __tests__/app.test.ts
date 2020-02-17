@@ -1,29 +1,54 @@
 import {app, AppContext} from '../src/app'
 import {
   CreateDeploymentStatusResponse,
-  CreateDeploymentResponse
+  CreateDeploymentResponse,
+  CreateDeploymentParams,
+  CreateDeploymentStatusParams
 } from '../src/github-client'
-import {setFailed} from '@actions/core'
 
 type MockAppContext = AppContext & {
-  setFailedCalled: boolean
+  hasFailed: boolean
+  deploymentParams: CreateDeploymentParams | undefined
+  deploymentStatusParams: CreateDeploymentStatusParams | undefined
+  failedMessage: string | undefined
+  output: {[key: string]: string}
 }
 
-const createMockAppContext = (): MockAppContext => {
+const createMockAppContext = (inputs: {
+  [key: string]: string
+}): MockAppContext => {
   return {
-    setFailedCalled: false,
+    output: {},
+    hasFailed: false,
+    failedMessage: undefined,
+    deploymentParams: undefined,
+    deploymentStatusParams: undefined,
     getInput(input, options) {
-      return ''
+      return inputs[input]
     },
     setFailed(message) {
-      this.setFailedCalled = true
+      this.hasFailed = true
+      this.failedMessage = message
     },
-    setOutput(name, value) {},
-    info() {},
+    setOutput(name, value) {
+      this.output[name] = value
+    },
+    info(msg) {
+      //   console.log(msg)
+    },
+    error(msg) {
+      //   console.log(msg)
+    },
     async createDeployment(params) {
-      return {} as CreateDeploymentResponse
+      this.deploymentParams = params
+      return {
+        data: {
+          id: 1
+        }
+      } as CreateDeploymentResponse
     },
-    async createDeploymentStatus() {
+    async createDeploymentStatus(params) {
+      this.deploymentStatusParams = params
       return {
         data: {
           deployment_url: '',
@@ -44,7 +69,15 @@ const createMockAppContext = (): MockAppContext => {
       } as CreateDeploymentStatusResponse
     },
     gitHubContext: {
-      payload: {},
+      payload: {
+        pull_request: {
+          number: 1,
+          head: {
+            ref: ''
+          },
+          user: ''
+        }
+      },
       eventName: 'pull_request',
       ref: '',
       repo: {
@@ -65,13 +98,32 @@ const createMockAppContext = (): MockAppContext => {
 }
 
 describe('app', () => {
-  it('fails on invalid values', async () => {
-    const mockAppContext = createMockAppContext()
+  it('creates deployment', async () => {
+    const mockAppContext = createMockAppContext({
+      environmentUrl: 'https://www.example.com'
+    })
 
     await app(mockAppContext)
 
-    expect(mockAppContext.setFailedCalled).toBe(true)
+    expect(mockAppContext.hasFailed).toBe(false)
+    expect(mockAppContext.deploymentParams).toEqual({
+      auto_merge: false,
+      environment: 'qa',
+      owner: '',
+      production_environment: false,
+      ref: '',
+      repo: '',
+      required_contexts: [],
+      transient_environment: false
+    })
+    expect(mockAppContext.deploymentStatusParams).toEqual({
+      deployment_id: 1,
+      description: 'this is pr',
+      owner: '',
+      repo: '',
+      log_url: 'https://github.com///commit//checks',
+      environment_url: 'https://www.example.com',
+      state: undefined
+    })
   })
-
-  it()
 })

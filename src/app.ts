@@ -16,8 +16,8 @@ export const app = async (context: AppContext): Promise<void> => {
 
     if (isNaN(deploymentId)) {
       const deploymentPayload = createDeploymentPayload(context)
-      const deploy = await context.createDeployment(deploymentPayload)
-      deploymentId = deploy.data.id
+      const deployment = await context.createDeployment(deploymentPayload)
+      deploymentId = deployment.data.id
       context.info(`Created deployment id: ${deploymentId}`)
     }
 
@@ -33,6 +33,7 @@ export const app = async (context: AppContext): Promise<void> => {
 
     context.setOutput('deploymentId', `${deploymentId}`)
   } catch (error) {
+    context.error(error.message)
     context.setFailed(error.message)
   }
 }
