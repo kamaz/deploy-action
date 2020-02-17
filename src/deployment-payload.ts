@@ -24,7 +24,7 @@ export const createDeploymentPayload = (
   const autoMerge = context.getInput('autoMerge')
   const transientEnvironment = context.getInput('transientEnvironment')
   const productionEnvironment = context.getInput('productionEnvironment')
-  const environment = context.getInput('') ?? envName(context)
+  const environment = envName(context)
 
   return {
     owner,

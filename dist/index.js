@@ -9516,7 +9516,7 @@ const envName = (context) => {
     return type === 'push' ? 'qa' : `pr-${number}`;
 };
 exports.createDeploymentPayload = (context) => {
-    var _a, _b;
+    var _a;
     const { owner, ref, repo } = deployment_context_1.deploymentContext(context);
     const requiredContext = (_a = context.getInput('requiredContext'), (_a !== null && _a !== void 0 ? _a : ''))
         .split(',')
@@ -9524,7 +9524,7 @@ exports.createDeploymentPayload = (context) => {
     const autoMerge = context.getInput('autoMerge');
     const transientEnvironment = context.getInput('transientEnvironment');
     const productionEnvironment = context.getInput('productionEnvironment');
-    const environment = (_b = context.getInput(''), (_b !== null && _b !== void 0 ? _b : envName(context)));
+    const environment = envName(context);
     return {
         owner,
         repo,
