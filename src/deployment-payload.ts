@@ -6,7 +6,6 @@ import {AppContext} from './app'
 const envName = (context: AppContext): string => {
   const {type, number} = deploymentContext(context)
   const environment = context.getInput('environment')
-  context.info(`env name is: ${environment}`)
   if (environment && environment !== '') {
     return environment
   }
