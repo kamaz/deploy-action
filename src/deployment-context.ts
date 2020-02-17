@@ -7,6 +7,8 @@ interface DeploymentContext {
   repo: string
   ref: string
   login: string
+  type: 'push' | 'pull_request'
+  number?: number
 }
 
 export const deploymentContext = (context: AppContext): DeploymentContext => {
@@ -22,7 +24,8 @@ export const deploymentContext = (context: AppContext): DeploymentContext => {
       owner,
       repo,
       ref,
-      login: name
+      login: name,
+      type: 'push'
     }
   } else if (eventName === 'pull_request') {
     const {pull_request} = payload as Webhooks.WebhookPayloadPullRequest
@@ -30,11 +33,14 @@ export const deploymentContext = (context: AppContext): DeploymentContext => {
     const {
       user: {login}
     } = pull_request
+    const {number} = pull_request
     return {
       owner,
       repo,
       ref,
-      login
+      login,
+      number,
+      type: 'pull_request'
     }
   } else {
     const message = `unsupported event name: ${eventName}`

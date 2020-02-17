@@ -25,7 +25,6 @@ inputs:
   environment:
     description: Transient environment
     required: false
-    default: 'qa'
   transientEnvironment:
     description: Transient environment
     required: false

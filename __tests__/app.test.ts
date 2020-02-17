@@ -5,6 +5,7 @@ import {
   CreateDeploymentParams,
   CreateDeploymentStatusParams
 } from '../src/github-client'
+import {Context} from '@actions/github/lib/context'
 
 type MockAppContext = AppContext & {
   hasFailed: boolean
@@ -14,9 +15,62 @@ type MockAppContext = AppContext & {
   output: {[key: string]: string}
 }
 
-const createMockAppContext = (inputs: {
-  [key: string]: string
-}): MockAppContext => {
+const pullRequestGitHubContext: Context = {
+  payload: {
+    pull_request: {
+      number: 1,
+      head: {
+        ref: ''
+      },
+      user: ''
+    }
+  },
+  eventName: 'pull_request',
+  ref: '',
+  repo: {
+    owner: '',
+    repo: ''
+  },
+  sha: '',
+  workflow: '',
+  action: '',
+  actor: '',
+  issue: {
+    number: 1,
+    owner: '',
+    repo: ''
+  }
+}
+const pushGitHubContext: Context = {
+  payload: {
+    ref: 'push_ref',
+    pusher: {
+      name: 'pusher_name'
+    }
+  },
+  eventName: 'push',
+  ref: '',
+  repo: {
+    owner: '',
+    repo: ''
+  },
+  sha: '',
+  workflow: '',
+  action: '',
+  actor: '',
+  issue: {
+    number: 1,
+    owner: '',
+    repo: ''
+  }
+}
+
+const createMockAppContext = (
+  inputs: {
+    [key: string]: string
+  },
+  gitHubContext: Context
+): MockAppContext => {
   return {
     output: {},
     hasFailed: false,
@@ -68,47 +122,25 @@ const createMockAppContext = (inputs: {
         status: 200
       } as CreateDeploymentStatusResponse
     },
-    gitHubContext: {
-      payload: {
-        pull_request: {
-          number: 1,
-          head: {
-            ref: ''
-          },
-          user: ''
-        }
-      },
-      eventName: 'pull_request',
-      ref: '',
-      repo: {
-        owner: '',
-        repo: ''
-      },
-      sha: '',
-      workflow: '',
-      action: '',
-      actor: '',
-      issue: {
-        number: 1,
-        owner: '',
-        repo: ''
-      }
-    }
+    gitHubContext
   }
 }
 
 describe('app', () => {
-  it('creates deployment', async () => {
-    const mockAppContext = createMockAppContext({
-      environmentUrl: 'https://www.example.com'
-    })
+  it('creates deployment for pull request', async () => {
+    const mockAppContext = createMockAppContext(
+      {
+        environmentUrl: 'https://www.example.com'
+      },
+      pullRequestGitHubContext
+    )
 
     await app(mockAppContext)
 
     expect(mockAppContext.hasFailed).toBe(false)
     expect(mockAppContext.deploymentParams).toEqual({
       auto_merge: false,
-      environment: 'pr1',
+      environment: 'pr-1',
       owner: '',
       production_environment: false,
       ref: '',
@@ -125,6 +157,63 @@ describe('app', () => {
       log_url: 'https://github.com///commit//checks',
       environment_url: 'https://www.example.com',
       state: undefined
+    })
+  })
+
+  it('creates deployment for push to master', async () => {
+    const mockAppContext = createMockAppContext(
+      {
+        environmentUrl: 'https://www.example.com'
+      },
+      pushGitHubContext
+    )
+
+    await app(mockAppContext)
+
+    expect(mockAppContext.hasFailed).toBe(false)
+    expect(mockAppContext.deploymentParams).toEqual({
+      auto_merge: false,
+      environment: 'qa',
+      owner: '',
+      production_environment: false,
+      ref: 'push_ref',
+      repo: '',
+      required_contexts: [],
+      transient_environment: false
+    })
+    expect(mockAppContext.deploymentStatusParams).toEqual({
+      deployment_id: 1,
+      description: 'this is pr',
+      auto_inactive: true,
+      owner: '',
+      repo: '',
+      log_url: 'https://github.com///commit//checks',
+      environment_url: 'https://www.example.com',
+      state: undefined
+    })
+  })
+
+  it('environment input override the default value', async () => {
+    const mockAppContext = createMockAppContext(
+      {
+        environmentUrl: 'https://www.example.com',
+        environment: 'staging'
+      },
+      pushGitHubContext
+    )
+
+    await app(mockAppContext)
+
+    expect(mockAppContext.hasFailed).toBe(false)
+    expect(mockAppContext.deploymentParams).toEqual({
+      auto_merge: false,
+      environment: 'staging',
+      owner: '',
+      production_environment: false,
+      ref: 'push_ref',
+      repo: '',
+      required_contexts: [],
+      transient_environment: false
     })
   })
 })

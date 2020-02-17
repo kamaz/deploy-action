@@ -18,7 +18,7 @@ For detail documentation and explanation refer to:
 | environmentUrl        | Yes      | -       |                        |
 | requiredContext       | Yes      | Empty   | Format 'value1,value2' |
 | autoMerge             | Yes      | false   |                        |
-| environment           | Yes      | qa      |                        |
+| environment           | Yes      | `pr-number` or `qa`     | for pull request it default to pr-[number] for push it default to qa                      |
 | transientEnvironment  | Yes      | false   |                        |
 | productionEnvironment | Yes      | false   |                        |
 

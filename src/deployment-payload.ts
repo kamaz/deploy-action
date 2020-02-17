@@ -3,6 +3,12 @@ import {deploymentContext} from './deployment-context'
 import {isTrue} from './converter'
 import {AppContext} from './app'
 
+const envName = (context: AppContext): string => {
+  const {type, number} = deploymentContext(context)
+
+  return type === 'push' ? 'qa' : `pr-${number}`
+}
+
 export const createDeploymentPayload = (
   context: AppContext
 ): Octokit.ReposCreateDeploymentParams => {
@@ -13,14 +19,14 @@ export const createDeploymentPayload = (
   const autoMerge = context.getInput('autoMerge')
   const transientEnvironment = context.getInput('transientEnvironment')
   const productionEnvironment = context.getInput('productionEnvironment')
-  // const environment = context.getInput('environment') ?? 'qa'
+  const environment = context.getInput('environment') ?? envName(context)
 
   return {
     owner,
     repo,
     ref,
     required_contexts: requiredContext,
-    environment: 'pr1',
+    environment,
     transient_environment: isTrue(transientEnvironment),
     auto_merge: isTrue(autoMerge),
     production_environment: isTrue(productionEnvironment)
