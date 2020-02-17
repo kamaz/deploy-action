@@ -4,6 +4,16 @@ import {AppContext} from './app'
 
 type DeploymentState = Octokit.ReposCreateDeploymentStatusParams['state']
 
+const logUrl = (context: AppContext): string => {
+  const {type, number, owner, repo} = deploymentContext(context)
+  const {sha} = context.gitHubContext
+  if (type === 'push') {
+    return `https://github.com/${owner}/${repo}/commit/${sha}/checks`
+  }
+
+  return `https://github.com/${owner}/${repo}/pull/${number}/checks`
+}
+
 export const createDeploymentStatusPayload = (
   deploymentId: number,
   context: AppContext
@@ -11,8 +21,6 @@ export const createDeploymentStatusPayload = (
   const {owner, repo} = deploymentContext(context)
   const state = context.getInput('state') as DeploymentState
   const environmentUrl = context.getInput('environmentUrl')
-  const {sha} = context.gitHubContext
-  const logUrl = `https://github.com/${owner}/${repo}/commit/${sha}/checks`
   return {
     owner,
     repo,
@@ -20,7 +28,7 @@ export const createDeploymentStatusPayload = (
     deployment_id: deploymentId,
     state,
     description: 'this is pr',
-    log_url: logUrl,
+    log_url: logUrl(context),
     environment_url: environmentUrl
   }
 }

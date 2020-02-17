@@ -156,7 +156,7 @@ describe('app', () => {
       auto_inactive: true,
       owner: 'kamaz',
       repo: 'actions',
-      log_url: 'https://github.com/kamaz/actions/commit/pull_sha/checks',
+      log_url: 'https://github.com/kamaz/actions/pull/1/checks',
       environment_url: 'https://www.example.com',
       state: undefined
     })

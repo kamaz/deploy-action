@@ -8972,12 +8972,18 @@ if (process.platform === 'linux') {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const deployment_context_1 = __webpack_require__(157);
+const logUrl = (context) => {
+    const { type, number, owner, repo } = deployment_context_1.deploymentContext(context);
+    const { sha } = context.gitHubContext;
+    if (type === 'push') {
+        return `https://github.com/${owner}/${repo}/commit/${sha}/checks`;
+    }
+    return `https://github.com/${owner}/${repo}/pull/${number}/checks`;
+};
 exports.createDeploymentStatusPayload = (deploymentId, context) => {
     const { owner, repo } = deployment_context_1.deploymentContext(context);
     const state = context.getInput('state');
     const environmentUrl = context.getInput('environmentUrl');
-    const { sha } = context.gitHubContext;
-    const logUrl = `https://github.com/${owner}/${repo}/commit/${sha}/checks`;
     return {
         owner,
         repo,
@@ -8985,7 +8991,7 @@ exports.createDeploymentStatusPayload = (deploymentId, context) => {
         deployment_id: deploymentId,
         state,
         description: 'this is pr',
-        log_url: logUrl,
+        log_url: logUrl(context),
         environment_url: environmentUrl
     };
 };
