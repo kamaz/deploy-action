@@ -2,7 +2,7 @@ import {Octokit} from '@octokit/rest'
 import {deploymentContext} from './deployment-context'
 import {AppContext} from './app'
 
-type DeploymentState = Octokit.ReposCreateDeploymentStatusParams['state']
+export type DeploymentState = Octokit.ReposCreateDeploymentStatusParams['state']
 
 export const createDeploymentStatusPayload = (
   deploymentId: number,

@@ -13,6 +13,10 @@ export type CreateDeploymentResponse = Octokit.Response<
   Octokit.ReposCreateDeploymentResponse
 >
 
+export type ListDeploymentsResponse = Octokit.Response<
+  Octokit.ReposListDeploymentsResponse
+>
+
 export type CreateDeployment = (
   params: CreateDeploymentParams
 ) => Promise<CreateDeploymentResponse>
@@ -25,9 +29,13 @@ export type CreateDeploymentStatus = (
   params: CreateDeploymentStatusParams
 ) => Promise<CreateDeploymentStatusResponse>
 
+export type ListDeployments = () => Promise<ListDeploymentsResponse>
+
 export type GitHubClient = {
   createDeployment: CreateDeployment
   createDeploymentStatus: CreateDeploymentStatus
+  listDeployments: ListDeployments
+  request<T>(url: string): Promise<Octokit.Response<T>>
 }
 
 export const createGitHubClient = (context: GitHubContext): GitHubClient => {
@@ -39,6 +47,12 @@ export const createGitHubClient = (context: GitHubContext): GitHubClient => {
     },
     async createDeploymentStatus(deploymentStatus) {
       return octokit.repos.createDeploymentStatus(deploymentStatus)
+    },
+    async listDeployments() {
+      return octokit.repos.listDeployments()
+    },
+    async request<T>(url: string) {
+      return (octokit.request(url) as unknown) as Octokit.Response<T>
     }
   }
 }
