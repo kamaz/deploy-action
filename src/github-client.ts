@@ -8,9 +8,14 @@ Octokit.plugin([throttling, retry])
 
 export type CreateDeploymentParams = Octokit.ReposCreateDeploymentParams
 export type CreateDeploymentStatusParams = Octokit.ReposCreateDeploymentStatusParams
+export type ListDeploymentsParam = Octokit.ReposListDeploymentsParams
 
 export type CreateDeploymentResponse = Octokit.Response<
   Octokit.ReposCreateDeploymentResponse
+>
+
+export type ListDeploymentsResponse = Octokit.Response<
+  Octokit.ReposListDeploymentsResponse
 >
 
 export type CreateDeployment = (
@@ -25,9 +30,15 @@ export type CreateDeploymentStatus = (
   params: CreateDeploymentStatusParams
 ) => Promise<CreateDeploymentStatusResponse>
 
+export type ListDeployments = (
+  params: ListDeploymentsParam
+) => Promise<ListDeploymentsResponse>
+
 export type GitHubClient = {
   createDeployment: CreateDeployment
   createDeploymentStatus: CreateDeploymentStatus
+  listDeployments: ListDeployments
+  request<T>(url: string): Promise<Octokit.Response<T>>
 }
 
 export const createGitHubClient = (context: GitHubContext): GitHubClient => {
@@ -39,6 +50,12 @@ export const createGitHubClient = (context: GitHubContext): GitHubClient => {
     },
     async createDeploymentStatus(deploymentStatus) {
       return octokit.repos.createDeploymentStatus(deploymentStatus)
+    },
+    async listDeployments(params) {
+      return octokit.repos.listDeployments(params)
+    },
+    async request<T>(url: string) {
+      return (octokit.request(url) as unknown) as Octokit.Response<T>
     }
   }
 }

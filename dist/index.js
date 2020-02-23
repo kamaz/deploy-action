@@ -4507,20 +4507,50 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const deployment_payload_1 = __webpack_require__(792);
 const deployment_status_payload_1 = __webpack_require__(666);
+const deployment_context_1 = __webpack_require__(157);
+const getDeploymentId = (context) => {
+    return parseInt(context.getInput('deploymentId'), 10);
+};
+const isInactive = (context) => {
+    const state = context.getInput('state');
+    const deploymentId = getDeploymentId(context);
+    return state === 'inactive' && isNaN(deploymentId);
+};
+const createDeploymentStatus = (deploymentId, context) => __awaiter(void 0, void 0, void 0, function* () {
+    const deploymentStatusPayload = deployment_status_payload_1.createDeploymentStatusPayload(deploymentId, context);
+    const deploymentStatus = yield context.createDeploymentStatus(deploymentStatusPayload);
+    context.info(`Created deployment status: ${deploymentStatus.data.id}`);
+});
+const hasInactiveStatus = (status) => status.some(d => d.state === 'inactive');
 exports.app = (context) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        let deploymentId = parseInt(context.getInput('deploymentId'), 10);
-        context.info(`Deployment id ${deploymentId}`);
-        if (isNaN(deploymentId)) {
-            const deploymentPayload = deployment_payload_1.createDeploymentPayload(context);
-            const deployment = yield context.createDeployment(deploymentPayload);
-            deploymentId = deployment.data.id;
-            context.info(`Created deployment id: ${deploymentId}`);
+        let deploymentId;
+        if (isInactive(context)) {
+            const { owner, repo, ref } = deployment_context_1.deploymentContext(context);
+            const deployments = yield context.listDeployments({
+                owner,
+                repo,
+                ref
+            });
+            for (const deployment of deployments.data) {
+                const status = yield context.request(deployment.statuses_url);
+                if (!hasInactiveStatus(status.data)) {
+                    yield createDeploymentStatus(deployment.id, context);
+                }
+            }
         }
-        const deploymentStatusPayload = deployment_status_payload_1.createDeploymentStatusPayload(deploymentId, context);
-        const deploymentStatus = yield context.createDeploymentStatus(deploymentStatusPayload);
-        context.info(`Created deployment status: ${deploymentStatus.data.id}`);
-        context.setOutput('deploymentId', `${deploymentId}`);
+        else {
+            deploymentId = getDeploymentId(context);
+            context.info(`Deployment id ${deploymentId}`);
+            if (isNaN(deploymentId)) {
+                const deploymentPayload = deployment_payload_1.createDeploymentPayload(context);
+                const deployment = yield context.createDeployment(deploymentPayload);
+                deploymentId = deployment.data.id;
+                context.info(`Created deployment id: ${deploymentId}`);
+            }
+            yield createDeploymentStatus(deploymentId, context);
+            context.setOutput('deploymentId', `${deploymentId}`);
+        }
     }
     catch (error) {
         context.error(error.message);
@@ -5019,6 +5049,16 @@ exports.createGitHubClient = (context) => {
         createDeploymentStatus(deploymentStatus) {
             return __awaiter(this, void 0, void 0, function* () {
                 return octokit.repos.createDeploymentStatus(deploymentStatus);
+            });
+        },
+        listDeployments(params) {
+            return __awaiter(this, void 0, void 0, function* () {
+                return octokit.repos.listDeployments(params);
+            });
+        },
+        request(url) {
+            return __awaiter(this, void 0, void 0, function* () {
+                return octokit.request(url);
             });
         }
     };

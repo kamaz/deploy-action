@@ -1,0 +1,15 @@
+name: 'tear-down-test'
+on: # rebuild any PRs and main branch changes
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  tear-down:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+          state: inactive
