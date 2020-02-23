@@ -1,5 +1,8 @@
 import {createDeploymentPayload} from './deployment-payload'
-import {createDeploymentStatusPayload} from './deployment-status-payload'
+import {
+  createDeploymentStatusPayload,
+  DeploymentState
+} from './deployment-status-payload'
 import {Octokit} from '@octokit/rest'
 import {GitHubClient} from './github-client'
 import {GitHubContext} from './github-context'
