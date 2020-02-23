@@ -3,7 +3,8 @@ import {
   CreateDeploymentStatusResponse,
   CreateDeploymentResponse,
   CreateDeploymentParams,
-  CreateDeploymentStatusParams
+  CreateDeploymentStatusParams,
+  ListDeploymentsResponse
 } from '../src/github-client'
 import {Context} from '@actions/github/lib/context'
 
@@ -121,6 +122,12 @@ const createMockAppContext = (
         headers: {},
         status: 200
       } as CreateDeploymentStatusResponse
+    },
+    async listDeployments(params) {
+      return {} as ListDeploymentsResponse
+    },
+    async request<T>(url: string) {
+      return {} as T
     },
     gitHubContext
   }
