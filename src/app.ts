@@ -7,6 +7,7 @@ import {Octokit} from '@octokit/rest'
 import {GitHubClient} from './github-client'
 import {GitHubContext} from './github-context'
 import {Context} from '@actions/github/lib/context'
+import {deploymentContext} from './deployment-context'
 
 export type AppContext = GitHubContext &
   GitHubClient & {
@@ -48,7 +49,12 @@ export const app = async (context: AppContext): Promise<void> => {
   try {
     let deploymentId: number
     if (isInactive(context)) {
-      const deployments = await context.listDeployments()
+      const {owner, repo, ref} = deploymentContext(context)
+      const deployments = await context.listDeployments({
+        owner,
+        repo,
+        ref
+      })
 
       for (const deployment of deployments.data) {
         const status = await context.request<

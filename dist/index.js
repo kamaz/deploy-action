@@ -4507,6 +4507,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const deployment_payload_1 = __webpack_require__(792);
 const deployment_status_payload_1 = __webpack_require__(666);
+const deployment_context_1 = __webpack_require__(157);
 const getDeploymentId = (context) => {
     return parseInt(context.getInput('deploymentId'), 10);
 };
@@ -4525,7 +4526,12 @@ exports.app = (context) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let deploymentId;
         if (isInactive(context)) {
-            const deployments = yield context.listDeployments();
+            const { owner, repo, ref } = deployment_context_1.deploymentContext(context);
+            const deployments = yield context.listDeployments({
+                owner,
+                repo,
+                ref
+            });
             for (const deployment of deployments.data) {
                 const status = yield context.request(deployment.statuses_url);
                 if (!hasInactiveStatus(status.data)) {
@@ -5045,9 +5051,9 @@ exports.createGitHubClient = (context) => {
                 return octokit.repos.createDeploymentStatus(deploymentStatus);
             });
         },
-        listDeployments() {
+        listDeployments(params) {
             return __awaiter(this, void 0, void 0, function* () {
-                return octokit.repos.listDeployments();
+                return octokit.repos.listDeployments(params);
             });
         },
         request(url) {
